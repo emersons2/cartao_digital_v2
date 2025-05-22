@@ -9,11 +9,13 @@ public static class CustomerRepository
         return Customers;
     }
 
-    public static void Add(Customer customer)
+    public static Customer Add(Customer customer)
     {
         customer.CustomerId = customerId;
         Customers.Add(customer);
         customerId++;
+
+        return customer;
     }
 
     public static void Update(Customer customer)
