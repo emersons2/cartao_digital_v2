@@ -1,17 +1,32 @@
 public class CustomerService
 {
-    public List<Customer> GetCustomers()
+    public List<Customer> GetCustomers(string? documentNumber, int? birthYear)
     {
-        // TODO: Substituir o método BuildFakeCustomers pela consulta aos dados reais no banco de dados.
-        var customers = BuildFakeCustomers();
-        return customers;
+        var customers = CustomerRepository.GetCustomers()
+            .Where(customer => (documentNumber == null || customer.DocumentNumber == documentNumber)
+                && (birthYear == null || customer.BirthDate.Year == birthYear));
+
+        return customers.ToList();
     }
 
     public Customer CreateCustomer(
         string fullName,
-        DateTime birthDate,
+        int birthYear,
+        int birthMonth,
+        int birthDay,
         string documentNumber)
     {
+        // Verificar se já existe algum cliente com o documento informado
+        // LINQ expression
+        var documentExists = CustomerRepository.GetCustomers().Any(customer => customer.DocumentNumber == documentNumber);
+
+        if (documentExists)
+        {
+            throw new Exception("Número de documento já utilizado");
+        }
+
+        var birthDate = new DateTime(birthYear, birthMonth, birthDay);
+
         var customer = new Customer
         {
             FullName = fullName,
@@ -19,9 +34,7 @@ public class CustomerService
             DocumentNumber = documentNumber
         };
 
-        // TODO: Salvar no banco de dados.
-
-        return customer;
+        return CustomerRepository.Add(customer);
     }
 
     private List<Customer> BuildFakeCustomers()
@@ -51,3 +64,29 @@ public class CustomerService
         return customers;
     }
 }
+
+// public class CustomerService
+// {
+//     public List<Customer> GetCustomers()
+//     {
+//         // TODO: Substituir o método BuildFakeCustomers pela consulta aos dados reais no banco de dados.
+//         return CustomerRepository.GetCustomers();
+//     }
+
+//     public Customer CreateCustomer(
+//         string fullName,
+//         DateTime birthDate,
+//         string documentNumber)
+//     {
+//         var customer = new Customer
+//         {
+//             FullName = fullName,
+//             BirthDate = birthDate,
+//             DocumentNumber = documentNumber
+//         };
+
+//         CustomerRepository.Add(customer);
+
+//         return customer;
+//     }
+// }

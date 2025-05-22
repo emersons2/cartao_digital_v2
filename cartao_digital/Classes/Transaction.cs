@@ -6,7 +6,7 @@ public class Transaction
 
     public string Description { get; set; }
 
-    public int CardID { get; set; }
+    public int CardId { get; set; }
 
     public double Value { get; set; }
 }
