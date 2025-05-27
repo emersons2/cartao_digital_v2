@@ -1,46 +1,72 @@
-public static class CustomerRepository
+public class CustomerRepository
 {
-    private static List<Customer> Customers { get; } = [];
+    private readonly JsonDatabase<Customer> _jsonDb = new JsonDatabase<Customer>();
 
-    private static int customerId = 1;
+    // private static List<Customer> Customers { get; } = [];
 
-    public static List<Customer> GetCustomers()
+    // private  int _customerId = 1;
+
+    public List<Customer> GetCustomers()
     {
-        return Customers;
+        return _jsonDb.GetData();
     }
 
-    public static Customer Add(Customer customer)
+    public Customer Add(Customer customer)
     {
-        customer.CustomerId = customerId;
-        Customers.Add(customer);
-        customerId++;
+        var customers = _jsonDb.GetData();
+        customer.CustomerId = customers.Count > 0 ? customers.Max(c => c.CustomerId) + 1 : 1;
+        customers.Add(customer);
+        _jsonDb.SaveChanges(customers);
 
         return customer;
+        
+        // _customerId = 2;
+        // customer.CustomerId = _customerId;
+        // Customers.Add(customer);
+        // _customerId++;
+
+        // return customer;
     }
 
-    public static void Update(Customer customer)
+    public Customer Update(Customer customer)
     {
-        var existingCustomer = Customers.FirstOrDefault(x => x.CustomerId == customer.CustomerId);
+        var customers = _jsonDb.GetData();
 
-        if (existingCustomer is null)
+        var index = customers.FindIndex(c => c.CustomerId == customer.CustomerId);
+        if (index >= 0)
         {
-            throw new Exception("Not found.");
+            customers[index] = customer;
+            _jsonDb.SaveChanges(customers);
         }
 
-        existingCustomer.BirthDate = customer.BirthDate;
-        existingCustomer.DocumentNumber = customer.DocumentNumber;
-        existingCustomer.FullName = customer.FullName;
+        return customer;
+        
+        // var existingCustomer = Customers.FirstOrDefault(x => x.CustomerId == customer.CustomerId);
+
+        // if (existingCustomer is null)
+        // {
+        //     throw new Exception("Not found.");
+        // }
+
+        // existingCustomer.BirthDate = customer.BirthDate;
+        // existingCustomer.DocumentNumber = customer.DocumentNumber;
+        // existingCustomer.FullName = customer.FullName;
+
+        // return existingCustomer;
     }
 
-    public static void Delete(int customerId)
+    public void Delete(int customerId)
     {
-        var existingCustomer = Customers.FirstOrDefault(x => x.CustomerId == customerId);
+        var customers = _jsonDb.GetData().Where(c => c.CustomerId != customerId).ToList();
+        _jsonDb.SaveChanges(customers);
 
-        if (existingCustomer is null)
-        {
-            throw new Exception("Not found.");
-        }
+        // var existingCustomer = Customers.FirstOrDefault(x => x.CustomerId == customerId);
 
-        Customers.Remove(existingCustomer);
+        // if (existingCustomer is null)
+        // {
+        //     throw new Exception("Not found.");
+        // }
+
+        // Customers.Remove(existingCustomer);
     }
 }

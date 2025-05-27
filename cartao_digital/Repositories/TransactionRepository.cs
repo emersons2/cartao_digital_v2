@@ -10,14 +10,16 @@ public static class TransactionRepository
         return Transactions;
     }
 
-    public static void Add(Transaction transaction)
+    public static Transaction Add(Transaction transaction)
     {
         transaction.TransactionId = transactionId;
         Transactions.Add(transaction);
         transactionId++;
+
+        return transaction;
     }
 
-    public static void Update(Transaction transaction)
+    public static Transaction Update(Transaction transaction)
     {
         var existingTransaction = Transactions.FirstOrDefault(x => x.TransactionId == transaction.TransactionId);
 
@@ -30,6 +32,8 @@ public static class TransactionRepository
         existingTransaction.TransactionDateTime = transaction.TransactionDateTime;
         existingTransaction.Value = transaction.Value;
         existingTransaction.CardId = transaction.CardId;
+
+        return existingTransaction;
     }
 
     public static void Delete(int transactionId)
