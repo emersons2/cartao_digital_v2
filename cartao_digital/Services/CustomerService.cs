@@ -38,4 +38,14 @@ public class CustomerService
 
         return _customerRepository.Add(customer);
     }
+
+    public Customer UpdateCustomer(Customer customer)
+    {
+        return _customerRepository.Update(customer);
+    }
+
+    public void DeleteCustomer(int customerId)
+    {
+        _customerRepository.Delete(customerId);
+    }
 }

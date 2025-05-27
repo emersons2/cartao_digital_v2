@@ -12,7 +12,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
-    public Customer CreateCustomer(
+    public IActionResult CreateCustomer(
         string fullName,
         int birthYear,
         int birthMonth,
@@ -21,6 +21,21 @@ public class CustomerController : ControllerBase
     )
     {
         var customerService = new CustomerService();
-        return customerService.CreateCustomer(fullName, birthYear, birthMonth, birthDay, documentNumber);
+        var customer = customerService.CreateCustomer(fullName, birthYear, birthMonth, birthDay, documentNumber);
+        return Accepted(customer);
+    }
+
+    [HttpPut]
+    public Customer UpdateCustomer([FromQuery] Customer customer)
+    {
+        var customerService = new CustomerService();
+        return customerService.UpdateCustomer(customer);
+    }
+
+    [HttpDelete]
+    public void DeleteCustomer(int customerId)
+    {
+        var customerService = new CustomerService();
+        customerService.DeleteCustomer(customerId);
     }
 }

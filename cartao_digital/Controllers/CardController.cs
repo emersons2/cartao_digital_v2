@@ -17,4 +17,6 @@ public class CardController : ControllerBase
 
         return Ok(customerCards);
     }
+
+    // TODO: Criar as rotas Post, Put e Delete para Cartões
 }
