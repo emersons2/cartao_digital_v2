@@ -7,6 +7,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddScoped<ICardService, CardService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+
+builder.Services.AddScoped<ICardRepository, CardRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

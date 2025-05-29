@@ -4,11 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 [Route("[controller]")]
 public class CustomerController : ControllerBase
 {
+    private readonly ICustomerService _customerService;
+
+    public CustomerController(ICustomerService customerService)
+    {
+        _customerService = customerService;
+    }
+
     [HttpGet("Customers")]
     public List<Customer> GetCustomers(string? documentNumber, int? birthYear)
     {
-        var customerService = new CustomerService();
-        return customerService.GetCustomers(documentNumber, birthYear);
+        return _customerService.GetCustomers(documentNumber, birthYear);
     }
 
     [HttpPost]
@@ -20,22 +26,19 @@ public class CustomerController : ControllerBase
         string documentNumber
     )
     {
-        var customerService = new CustomerService();
-        var customer = customerService.CreateCustomer(fullName, birthYear, birthMonth, birthDay, documentNumber);
+        var customer = _customerService.CreateCustomer(fullName, birthYear, birthMonth, birthDay, documentNumber);
         return Accepted(customer);
     }
 
     [HttpPut]
     public Customer UpdateCustomer([FromQuery] Customer customer)
     {
-        var customerService = new CustomerService();
-        return customerService.UpdateCustomer(customer);
+        return _customerService.UpdateCustomer(customer);
     }
 
     [HttpDelete]
     public void DeleteCustomer(int customerId)
     {
-        var customerService = new CustomerService();
-        customerService.DeleteCustomer(customerId);
+        _customerService.DeleteCustomer(customerId);
     }
 }

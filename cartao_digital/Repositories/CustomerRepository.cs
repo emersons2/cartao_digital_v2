@@ -1,4 +1,4 @@
-public class CustomerRepository
+public class CustomerRepository : ICustomerRepository
 {
     private readonly JsonDatabase<Customer> _jsonDb = new JsonDatabase<Customer>();
 

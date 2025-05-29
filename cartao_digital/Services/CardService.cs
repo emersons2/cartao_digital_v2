@@ -1,11 +1,17 @@
-public class CardService
+public class CardService : ICardService
 {
-    private readonly CardRepository _cardRepository = new CardRepository();
+    private readonly ICustomerService _customerService;
+    private readonly ICardRepository _cardRepository;
+
+    public CardService(ICustomerService customerService, ICardRepository cardRepository)
+    {
+        _customerService = customerService;
+        _cardRepository = cardRepository;
+    }
 
     public List<Card> GetCustomerCards(string documentNumber)
     {
-        var customerService = new CustomerService();
-        var customer = customerService.GetCustomers(documentNumber, null).FirstOrDefault();
+        var customer = _customerService.GetCustomers(documentNumber, null).FirstOrDefault();
 
         if (customer == null)
         {
@@ -19,8 +25,7 @@ public class CardService
 
     public Card CreateCustomerCard(string documentNumber)
     {
-        var customerService = new CustomerService();
-        var customer = customerService.GetCustomers(documentNumber, null).FirstOrDefault();
+        var customer = _customerService.GetCustomers(documentNumber, null).FirstOrDefault();
 
         if (customer == null)
         {

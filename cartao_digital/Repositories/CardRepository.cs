@@ -1,4 +1,4 @@
-public class CardRepository
+public class CardRepository : ICardRepository
 {
     private readonly JsonDatabase<Card> _jsonDb = new JsonDatabase<Card>();
     

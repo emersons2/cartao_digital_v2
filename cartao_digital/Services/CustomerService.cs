@@ -1,6 +1,11 @@
-public class CustomerService
+public class CustomerService : ICustomerService
 {
-    private readonly CustomerRepository _customerRepository = new CustomerRepository();
+    private readonly ICustomerRepository _customerRepository;
+
+    public CustomerService(ICustomerRepository customerRepository)
+    {
+        _customerRepository = customerRepository;
+    }
 
     public List<Customer> GetCustomers(string? documentNumber, int? birthYear)
     {
