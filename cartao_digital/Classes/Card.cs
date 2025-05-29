@@ -4,7 +4,7 @@ public class Card
 
     public string CardNumber { get; set; }
 
-    public int VerificationCode { get; set; }
+    public string VerificationCode { get; set; }
 
     public DateTime DueDate { get; set; }
 

@@ -18,5 +18,12 @@ public class CardController : ControllerBase
         return Ok(customerCards);
     }
 
+    [HttpPost("Card")]
+    public IActionResult CreateCustomerCard(string documentNumber)
+    {
+        var cardService = new CardService();
+        var customerCard = cardService.CreateCustomerCard(documentNumber);
+        return Accepted(customerCard);
+    }
     // TODO: Criar as rotas Post, Put e Delete para Cartões
 }

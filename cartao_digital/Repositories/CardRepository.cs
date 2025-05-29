@@ -1,44 +1,54 @@
-public static class CardRepository
+public class CardRepository
 {
-    private static List<Card> Cards { get; } = [];
-
-    private static int cardId = 1;
-
-    public static List<Card> GetCards()
+    private readonly JsonDatabase<Card> _jsonDb = new JsonDatabase<Card>();
+    
+    public List<Card> GetCards()
     {
-        return Cards;
+        return _jsonDb.GetData();
     }
 
-    public static void Add(Card card)
+    public Card Add(Card card)
     {
-        card.CardId = cardId;
-        Cards.Add(card);
-        cardId++;
+        var cards = _jsonDb.GetData();
+        card.CardId = cards.Count > 0
+            ? cards.Max(x => x.CardId) + 1
+            : 1;
+
+        // if (cards.Count > 0)
+        // {
+        //     card.CardId = cards.Max(x => x.CardId) + 1;
+        // }
+        // else
+        // {
+        //     card.CardId = 1;
+        // }
+
+        cards.Add(card);
+        _jsonDb.SaveChanges(cards);
+
+        return card;
     }
 
-    public static void Update(Card card)
+    public Card Update(Card card)
     {
-        var existingCard = Cards.FirstOrDefault(x => x.CardId == card.CardId);
+        var cards = _jsonDb.GetData();
 
-        if (existingCard is null)
+        // Verifique se todos os itens da minha lista possuem
+        // data de vencimento futura.
+
+        var index = cards.FindIndex(c => c.CardId == card.CardId);
+        if (index >= 0)
         {
-            throw new Exception("Not found.");
+            cards[index] = card;
+            _jsonDb.SaveChanges(cards);
         }
 
-        existingCard.CardNumber = card.CardNumber;
-        existingCard.DueDate = card.DueDate;
-        existingCard.VerificationCode = card.VerificationCode;
+        return card;
     }
 
-    public static void Delete(int cardId)
+    public void Delete(int cardId)
     {
-        var existingCard = Cards.FirstOrDefault(x => x.CardId == cardId);
-
-        if (existingCard is null)
-        {
-            throw new Exception("Not found.");
-        }
-
-        Cards.Remove(existingCard);
+        var cards = _jsonDb.GetData().Where(c => c.CardId != cardId).ToList();
+        _jsonDb.SaveChanges(cards);
     }
 }
