@@ -23,6 +23,23 @@ public class CardService : ICardService
         return cards.ToList();
     }
 
+    public bool CheckCardIsValid(int cardId)
+    {
+        var card = _cardRepository.GetCards().FirstOrDefault(x => x.CardId == cardId);
+
+        if (card == null)
+        {
+            return false;
+        }
+
+        if (card.DueDate < DateTime.Now)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
     public Card CreateCustomerCard(string documentNumber)
     {
         var customer = _customerService.GetCustomers(documentNumber, null).FirstOrDefault();

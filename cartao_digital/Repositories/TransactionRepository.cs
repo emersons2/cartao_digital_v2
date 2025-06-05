@@ -1,50 +1,40 @@
 
-public static class TransactionRepository
+public class TransactionRepository : ITransactionRepository
 {
-    private static List<Transaction> Transactions { get; } = [];
+    private readonly JsonDatabase<Transaction> _jsonDb = new JsonDatabase<Transaction>();
 
-    private static int transactionId = 1;
-
-    public static List<Transaction> GetTransactions()
+    public List<Transaction> GetCardTransactions(int cardId)
     {
-        return Transactions;
+        return _jsonDb.GetData().Where(x => x.CardId == cardId).ToList();
     }
 
-    public static Transaction Add(Transaction transaction)
+    public Transaction Add(Transaction transaction)
     {
-        transaction.TransactionId = transactionId;
-        Transactions.Add(transaction);
-        transactionId++;
+        var transactions = _jsonDb.GetData();
+        transaction.TransactionId = transactions.Count > 0 ? transactions.Max(t => t.TransactionId) + 1 : 1;
+        transactions.Add(transaction);
+        _jsonDb.SaveChanges(transactions);
 
         return transaction;
     }
 
-    public static Transaction Update(Transaction transaction)
+    public Transaction Update(Transaction transaction)
     {
-        var existingTransaction = Transactions.FirstOrDefault(x => x.TransactionId == transaction.TransactionId);
+        var transactions = _jsonDb.GetData();
 
-        if (existingTransaction is null)
+        var index = transactions.FindIndex(t => t.TransactionId == transaction.TransactionId);
+        if (index >= 0)
         {
-            throw new Exception("Not found.");
+            transactions[index] = transaction;
+            _jsonDb.SaveChanges(transactions);
         }
 
-        existingTransaction.Description = transaction.Description;
-        existingTransaction.TransactionDateTime = transaction.TransactionDateTime;
-        existingTransaction.Value = transaction.Value;
-        existingTransaction.CardId = transaction.CardId;
-
-        return existingTransaction;
+        return transaction;
     }
 
-    public static void Delete(int transactionId)
+    public void Delete(int transactionId)
     {
-        var existingTransaction = Transactions.FirstOrDefault(x => x.TransactionId == transactionId);
-
-        if (existingTransaction is null)
-        {
-            throw new Exception("Not found.");
-        }
-
-        Transactions.Remove(existingTransaction);
+        var transactions = _jsonDb.GetData().Where(t => t.TransactionId != transactionId).ToList();
+        _jsonDb.SaveChanges(transactions);
     }
 }
