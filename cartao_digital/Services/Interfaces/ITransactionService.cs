@@ -4,7 +4,7 @@ public interface ITransactionService
 {
     List<Transaction> GetTransactions(int cardId, DateTime startDate, DateTime endDate);
 
-    Transaction PostTransaction(PostTransactionRequest transaction);
+    Task<Transaction> PostTransaction(PostTransactionRequest request);
 
     FileContentResult GetTransactionsFile(int cardId, DateTime startDate, DateTime endDate);
 }

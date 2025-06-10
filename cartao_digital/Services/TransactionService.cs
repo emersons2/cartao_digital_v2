@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,6 +23,7 @@ public class TransactionService : ITransactionService
 
     public FileContentResult GetTransactionsFile(int cardId, DateTime startDate, DateTime endDate)
     {
+        // TODO: Filtrar por startDate e endDate
         var transactions = _transactionRepository.GetCardTransactions(cardId);
 
         if (transactions == null || transactions.Count == 0)
@@ -46,7 +48,7 @@ public class TransactionService : ITransactionService
         };
     }
 
-    public Transaction PostTransaction(PostTransactionRequest request)
+    public async Task<Transaction> PostTransaction(PostTransactionRequest request)
     {
         var card = _cardService.GetCardForTransaction(request);
 
@@ -60,6 +62,18 @@ public class TransactionService : ITransactionService
             throw new Exception("A transação precisa ter valor positivo");
         }
 
+        var watch = new Stopwatch();
+        watch.Start();
+
+        var taskCentralBank = GetCentralBankApproval(request);
+        var taskItau = GetItauApproval(request);
+
+        await taskCentralBank;
+        await taskItau;
+        
+        watch.Stop();
+        Debug.WriteLine($"Tempo decorrido: {watch.Elapsed.Seconds}s");
+
         var newTransaction = new Transaction
         {
             CardId = card.CardId,
@@ -71,5 +85,18 @@ public class TransactionService : ITransactionService
         newTransaction = _transactionRepository.Add(newTransaction);
 
         return newTransaction;
+    }
+
+    private async Task GetCentralBankApproval(PostTransactionRequest request)
+    {
+        // Simulação de tempo de resposta da aprovação do Banco Central
+        // Thread.Sleep(10000);
+        await Task.Delay(10000);
+    }
+
+    private async Task GetItauApproval(PostTransactionRequest request)
+    {
+        // Simulação de tempo de resposta da aprovação do Banco Central
+        await Task.Delay(5000);
     }
 }

@@ -38,9 +38,9 @@ public class TransactionController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult PostTransaction([FromBody]PostTransactionRequest request)
+    public async Task<IActionResult> PostTransaction([FromBody]PostTransactionRequest request)
     {
-        var newTransaction = _transactionService.PostTransaction(request);
+        var newTransaction = await _transactionService.PostTransaction(request);
         return Accepted(newTransaction);
     }
 }
