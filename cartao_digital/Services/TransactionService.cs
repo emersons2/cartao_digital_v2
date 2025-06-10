@@ -1,3 +1,6 @@
+using System.Text;
+using Microsoft.AspNetCore.Mvc;
+
 public class TransactionService : ITransactionService
 {
     private readonly ITransactionRepository _transactionRepository;
@@ -17,25 +20,55 @@ public class TransactionService : ITransactionService
             .Where(t => t.TransactionDateTime >= startDate && t.TransactionDateTime <= endDate).ToList();
     }
 
-    public Transaction PostTransaction(Transaction transaction)
+    public FileContentResult GetTransactionsFile(int cardId, DateTime startDate, DateTime endDate)
     {
-        if (!_cardService.CheckCardIsValid(transaction.CardId))
+        var transactions = _transactionRepository.GetCardTransactions(cardId);
+
+        if (transactions == null || transactions.Count == 0)
         {
-            throw new Exception("O cartão informado é inválido");
+            throw new Exception("Nenhuma transação encontrada");
         }
 
-        if (string.IsNullOrWhiteSpace(transaction.Description))
+        var stringBuilder = new StringBuilder();
+        stringBuilder.AppendLine("CodTransacao;DataHora;Descrição;Valor");
+
+        foreach (var transaction in transactions)
+        {
+            stringBuilder.AppendLine($"{transaction.TransactionId};{transaction.TransactionDateTime:dd/MM/yyyy HH:mm:ss};{transaction.Description};{transaction.Value:F2}");
+        }
+
+        byte[] fileBytes = Encoding.UTF8.GetBytes(stringBuilder.ToString());
+        var stream = new MemoryStream(fileBytes);
+
+        return new FileContentResult(stream.ToArray(), "text/csv")
+        {
+            FileDownloadName = "extrato.csv"
+        };
+    }
+
+    public Transaction PostTransaction(PostTransactionRequest request)
+    {
+        var card = _cardService.GetCardForTransaction(request);
+
+        if (string.IsNullOrWhiteSpace(request.Description))
         {
             throw new Exception("A transação precisa ter uma descrição");
         }
 
-        if (transaction.Value <= 0)
+        if (request.Value <= 0)
         {
             throw new Exception("A transação precisa ter valor positivo");
         }
 
-        transaction.TransactionDateTime = DateTime.Now;
-        var newTransaction = _transactionRepository.Add(transaction);
+        var newTransaction = new Transaction
+        {
+            CardId = card.CardId,
+            Description = request.Description,
+            Value = request.Value,
+            TransactionDateTime = DateTime.Now
+        };
+
+        newTransaction = _transactionRepository.Add(newTransaction);
 
         return newTransaction;
     }
