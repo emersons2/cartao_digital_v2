@@ -40,6 +40,33 @@ public class CardService : ICardService
         return true;
     }
 
+    public Card GetCardForTransaction(PostTransactionRequest request)
+    {
+        var card = _cardRepository.GetCards().FirstOrDefault(x => x.CardNumber == request.CardNumber);
+
+        if (card == null)
+        {
+            throw new Exception("Cartão não encontrado");
+        }
+
+        if (card.DueDate.Date < DateTime.Now.Date)
+        {
+            throw new Exception("Cartão vencido");
+        }
+
+        if (card.VerificationCode != request.VerificationCode)
+        {
+            throw new Exception("Código de verificação incorreto");
+        }
+
+        if (card.DueDate.Date != request.DueDate.Date)
+        {
+            throw new Exception("Data de vencimento incorreta");
+        }
+
+        return card;
+    }
+
     public Card CreateCustomerCard(string documentNumber)
     {
         var customer = _customerService.GetCustomers(documentNumber, null).FirstOrDefault();

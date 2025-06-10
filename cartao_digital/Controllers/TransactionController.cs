@@ -24,10 +24,23 @@ public class TransactionController : ControllerBase
         return Ok();
     }
 
-    [HttpPost]
-    public IActionResult PostTransaction(Transaction transaction)
+    [HttpGet("File")]
+    public IActionResult GetTransactionsFile(int cardId, DateTime startDate, DateTime endDate)
     {
-        var newTransaction = _transactionService.PostTransaction(transaction);
+        var file = _transactionService.GetTransactionsFile(cardId, startDate, endDate);
+
+        if (file == null)
+        {
+            return NoContent();
+        }
+
+        return file;
+    }
+
+    [HttpPost]
+    public IActionResult PostTransaction([FromBody]PostTransactionRequest request)
+    {
+        var newTransaction = _transactionService.PostTransaction(request);
         return Accepted(newTransaction);
     }
 }
