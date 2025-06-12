@@ -84,7 +84,7 @@ public class CardService : ICardService
         return newCard;
     }
 
-    private Card CreateNewCard()
+    public Card CreateNewCard()
     {
         var card = new Card();
         card.CardNumber = CreditCardGenerator.GenerateCardNumber("4539", 16);

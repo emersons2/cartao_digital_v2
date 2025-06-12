@@ -1,16 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 
+/// <summary>
+/// Provê ferramentas para cálculo matemático simples.
+/// </summary>
 [ApiController]
 [Route("[controller]")]
 public class CalculatorController : ControllerBase
 {
    private readonly CustomerService _customerService;
-    public CalculatorController(CustomerService customerService)
-    {
-        _customerService = customerService;
-    }
 
-    [HttpGet("Calculate")]
+   public CalculatorController(CustomerService customerService)
+   {
+      _customerService = customerService;
+   }
+
+   /// <summary>
+   /// Realiza operação matemática de acordo com o tipo de operação informado e os parâmetros desejados.
+   /// </summary>
+   /// <param name="operation">Informe a operação desejada: [soma, subtração, multiplicação, divisão]</param>
+   /// <param name="num1">Informe o primeiro valor da operação</param>
+   /// <param name="num2">Informe o segundo valor da operação</param>
+   /// <returns></returns>
+   [HttpGet("Calculate")]
    public string Calculate(string operation, double num1, double num2)
    {
       var alert = "Tome cuidado com números negativos";
@@ -19,7 +30,7 @@ public class CalculatorController : ControllerBase
       switch (operation)
       {
          case "soma":
-            result += Sum(num1, num2).ToString();
+            result = (num1 + num2).ToString();
             break;
          case "subtracao":
          case "subtração":
@@ -48,31 +59,37 @@ public class CalculatorController : ControllerBase
       return result;
    }
 
-   private double Sum(double value1, double value2)
+   /// <summary>
+   /// Realiza a soma dos dois valores informados.
+   /// </summary>
+   /// <param name="value1"></param>
+   /// <param name="value2"></param>
+   /// <returns></returns>
+   public static long Sum(long value1, long value2)
    {
-        var result = value1 + value2;
-        return result;
+      var result = value1 + value2;
+      return result;
    }
 
-   private double Subtract(double num1, double num2)
+   public static double Subtract(double num1, double num2)
    {
-        var result = num1 - num2;
-        return result;
+      var result = num1 - num2;
+      return result;
    }
 
    private double Multiply(double num1, double num2)
    {
-        var result = num1 * num2;
-        return result;
+      var result = num1 * num2;
+      return result;
    }
 
    private double Divide(double num1, double num2)
    {
-        if (num2 == 0)
-        {
-            throw new ArgumentException("Division by zero is not allowed.");
-        }
-        var result = num1 / num2;
-        return result;
+      if (num2 == 0)
+      {
+         throw new ArgumentException("Division by zero is not allowed.");
+      }
+      var result = num1 / num2;
+      return result;
    }
 }
